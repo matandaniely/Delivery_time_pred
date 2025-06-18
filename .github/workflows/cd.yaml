@@ -18,7 +18,7 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
-          python-version: '3.10'
+          python-version: '3.12'
 
       - name: Install dependencies
         run: |
@@ -30,13 +30,13 @@ jobs:
           python gh-repos/Delivery_time_pred/main.py
 
       - name: Upload ML model artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: best_model
           path: gh-repos/Delivery_time_pred/models/best_model.pkl
 
       - name: Upload MLflow tracking directory
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: mlflow-runs
           path: gh-repos/Delivery_time_pred/mlruns/
