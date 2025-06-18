@@ -23,7 +23,7 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install -r gh-repos/Delivery_time_pred/requirements.txt
+          pip install -r requirements.txt
 
       - name: Run pipeline again to generate artifacts
         run: |
