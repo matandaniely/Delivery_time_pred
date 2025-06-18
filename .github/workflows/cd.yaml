@@ -27,7 +27,7 @@ jobs:
 
       - name: Run pipeline again to generate artifacts
         run: |
-          python gh-repos/Delivery_time_pred/main.py
+          python main.py
 
       - name: Upload ML model artifact
         uses: actions/upload-artifact@v4
