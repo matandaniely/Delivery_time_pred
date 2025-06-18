@@ -13,7 +13,8 @@ import pandas as pd
 import joblib
 
 
-
+import mlflow
+import mlflow.sklearn
 
 def main():
     df = load_and_clean_data("data/deliverytime.csv")
@@ -24,6 +25,9 @@ def main():
     
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
+    mlflow.set_tracking_uri("http://127.0.0.1:8081")
+    mlflow.set_experiment("Delivery Time Model Comparison")
+
     models = [
         ("Linear", train_lr(X_train, y_train)),
         ("Random Forest", train_rf(X_train, y_train)),
@@ -32,13 +36,26 @@ def main():
 
     results = []
     for name, model in models:
-        scores = evaluate_model(model, X_test, y_test)
-        results.append((name, model, scores))
-        print(f"{name} MAE: {scores['mae']:.2f} | RMSE: {scores['rmse']:.2f} | R²: {scores['r2']:.2f}")
+        with mlflow.start_run(run_name=name) as run:
+            run_id = run.info.run_id
+            print(f"MLflow run ID for {name}: {run_id}")
+
+            scores = evaluate_model(model, X_test, y_test)
+            mlflow.log_params(model.get_params())   # Log full parameters
+            mlflow.log_param("model_name", name)
+            mlflow.log_metric("MAE", scores["mae"])
+            mlflow.log_metric("RMSE", scores["rmse"])
+            mlflow.log_metric("R2", scores["r2"])
+
+            mlflow.sklearn.log_model(model, artifact_path="model")
+
+            results.append((name, model, scores))
+            print(f"{name} MAE: {scores['mae']:.2f} | RMSE: {scores['rmse']:.2f} | R²: {scores['r2']:.2f}")
 
     best_name, best_model, best_scores = select_best_model(results)
     print(f"\n✅ Best model: {best_name} with MAE {best_scores['mae']:.2f}")
     joblib.dump(best_model, "models/best_model.pkl")
+
 
 if __name__ == "__main__":
     main()
