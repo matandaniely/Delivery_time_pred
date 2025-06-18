@@ -10,6 +10,9 @@ jobs:
   build:
     runs-on: ubuntu-latest
 
+    env:
+      MLFLOW_TRACKING_URI: http://127.0.0.1:8081
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
@@ -23,9 +26,21 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
+          pip install mlflow
+
+      - name: Start MLflow server in background
+        run: |
+          mlflow server --backend-store-uri sqlite:///mlflow.db --default-artifact-root ./mlruns --host 127.0.0.1 --port 8081 &
+          sleep 10
 
       - name: Run pipeline
         run: python Delivery_time_pred/main.py
 
       - name: Run tests
         run: pytest tests/
+
+      - name: Upload model artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: delivery-model
+          path: Delivery_time_pred/models/best_model.pkl
