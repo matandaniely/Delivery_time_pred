@@ -20,7 +20,9 @@ def main():
     df = load_and_clean_data("data/deliverytime.csv")
     df = add_distance_feature(df)
 
-    X = pd.get_dummies(df[['Delivery_person_Age', 'Delivery_person_Ratings', 'distance_km', 'Type_of_order', 'Type_of_vehicle']], drop_first=True)
+    X = pd.get_dummies(df[['Delivery_person_Age', 'Delivery_person_Ratings',
+                           'distance_km',     'Type_of_order', 
+                           'Type_of_vehicle']], drop_first=True)
     y = df['Time_taken(min)']
     
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
